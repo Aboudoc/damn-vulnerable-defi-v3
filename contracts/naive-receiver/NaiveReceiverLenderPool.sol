@@ -20,7 +20,7 @@ contract NaiveReceiverLenderPool is ReentrancyGuard, IERC3156FlashLender {
     error UnsupportedCurrency();
     error CallbackFailed();
 
-    // @audit-ok if token not allowed must return 0
+    // @audit-info if token not allowed must return 0
     function maxFlashLoan(address token) external view returns (uint256) {
         if (token == ETH) {
             return address(this).balance;
@@ -28,7 +28,7 @@ contract NaiveReceiverLenderPool is ReentrancyGuard, IERC3156FlashLender {
         return 0;
     }
 
-    // @audit-ok if token not allowed must revert
+    // @audit-info if token not allowed must revert
     function flashFee(address token, uint256) external pure returns (uint256) {
         if (token != ETH) {
             revert UnsupportedCurrency();
@@ -36,7 +36,7 @@ contract NaiveReceiverLenderPool is ReentrancyGuard, IERC3156FlashLender {
         return FIXED_FEE;
     }
 
-    // @audit-ok return bool or revert
+    // @audit-info return bool or revert
     function flashLoan(IERC3156FlashBorrower receiver, address token, uint256 amount, bytes calldata data)
         external
         returns (bool)
