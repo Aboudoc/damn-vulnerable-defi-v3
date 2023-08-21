@@ -3,8 +3,8 @@ pragma solidity ^0.8.0;
 
 import "solady/src/utils/FixedPointMathLib.sol";
 import "solady/src/utils/SafeTransferLib.sol";
-import { RewardToken } from "./RewardToken.sol";
-import { AccountingToken } from "./AccountingToken.sol";
+import {RewardToken} from "./RewardToken.sol";
+import {AccountingToken} from "./AccountingToken.sol";
 
 /**
  * @title TheRewarderPool
@@ -15,7 +15,7 @@ contract TheRewarderPool {
 
     // Minimum duration of each round of rewards in seconds
     uint256 private constant REWARDS_ROUND_MIN_DURATION = 5 days;
-    
+
     uint256 public constant REWARDS = 100 ether;
 
     // Token deposited into the pool by users
@@ -57,12 +57,7 @@ contract TheRewarderPool {
         accountingToken.mint(msg.sender, amount);
         distributeRewards();
 
-        SafeTransferLib.safeTransferFrom(
-            liquidityToken,
-            msg.sender,
-            address(this),
-            amount
-        );
+        SafeTransferLib.safeTransferFrom(liquidityToken, msg.sender, address(this), amount);
     }
 
     function withdraw(uint256 amount) external {
@@ -70,6 +65,15 @@ contract TheRewarderPool {
         SafeTransferLib.safeTransfer(liquidityToken, msg.sender, amount);
     }
 
+    // Alice deposits 5 ETH, Bob deposits 4 ETH
+    // Alice reward: (5 * 100) / 10 = 50 RWD
+    // Bob reward: (4 * 100) / 10 = 40 RWD
+    // Attacker deposits 1 ETH: rewards = (1 * 100) / 10 = 10 RWD
+
+    // @audit-issue An attacker can deposit a large amount of DVT using flash loan and claim rewards
+    // @audit-info check if it's a new round of rewards
+    // @audit-info calculate rewards for the user
+    // @audit-info mint rewards for the user if not already minted
     function distributeRewards() public returns (uint256 rewards) {
         if (isNewRewardsRound()) {
             _recordSnapshot();
