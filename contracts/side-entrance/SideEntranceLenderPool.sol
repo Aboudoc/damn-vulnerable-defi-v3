@@ -29,19 +29,21 @@ contract SideEntranceLenderPool {
 
     function withdraw() external {
         uint256 amount = balances[msg.sender];
-        
+
         delete balances[msg.sender];
         emit Withdraw(msg.sender, amount);
 
         SafeTransferLib.safeTransferETH(msg.sender, amount);
     }
 
+    //@audit-issue A malicious user can flash loan ETH from the pool and deposit it back into the pool, increasing their balance
     function flashLoan(uint256 amount) external {
         uint256 balanceBefore = address(this).balance;
 
         IFlashLoanEtherReceiver(msg.sender).execute{value: amount}();
 
-        if (address(this).balance < balanceBefore)
+        if (address(this).balance < balanceBefore) {
             revert RepayFailed();
+        }
     }
 }
