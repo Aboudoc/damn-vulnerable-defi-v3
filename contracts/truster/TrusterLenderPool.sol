@@ -21,6 +21,7 @@ contract TrusterLenderPool is ReentrancyGuard {
         token = _token;
     }
 
+    // @audit-issue A mallicious borrower can call flashLoan() and pass in token address as target with data as approve() call to approve() the pool to spend unlimited tokens
     function flashLoan(uint256 amount, address borrower, address target, bytes calldata data)
         external
         nonReentrant
@@ -31,8 +32,9 @@ contract TrusterLenderPool is ReentrancyGuard {
         token.transfer(borrower, amount);
         target.functionCall(data);
 
-        if (token.balanceOf(address(this)) < balanceBefore)
+        if (token.balanceOf(address(this)) < balanceBefore) {
             revert RepayFailed();
+        }
 
         return true;
     }
