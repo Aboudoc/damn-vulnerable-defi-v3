@@ -102,7 +102,7 @@ describe("[Challenge] Puppet v2", function () {
 
   it("Execution", async function () {
     /** CODE YOUR SOLUTION HERE */
-    // swap dvt to weth on uniswap
+    // swap dvt to weth on uniswap to manipulate the price
     await token
       .connect(player)
       .approve(uniswapRouter.address, PLAYER_INITIAL_TOKEN_BALANCE);
